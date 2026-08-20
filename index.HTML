@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Mô Phỏng & Giảng Dạy Thủ Tục Kiểm Tra Hải Quan - Chương 5</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- html2pdf Library for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --green-light: #e8f5e9;
+            --green-main: #2e7d32;
+            --green-accent: #4caf50;
+            --yellow-light: #fffde7;
+            --yellow-main: #fbc02d;
+            --yellow-accent: #f57f17;
+            --red-light: #ffebee;
+            --red-main: #d32f2f;
+            --red-accent: #f44336;
+            --bg-neutral: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-dark: #2c3e50;
+            --text-light: #666666;
+            --border-color: #e0e0e0;
+            --primary-blue: #1a5f7a;
+            --secondary-blue: #002b49;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-neutral);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: #ffffff;
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .nav-btn {
+            padding: 14px 20px;
+            border: none;
+            background: none;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+            background-color: #f8f9fa;
+        }
+
+        .nav-btn.btn-gv-tab {
+            background-color: #fff3cd;
+            color: #856404;
+            margin-left: auto;
+        }
+
+        .nav-btn.btn-gv-tab:hover {
+            background-color: #ffe8a1;
+            color: #533f03;
+        }
+
+        /* Main Layout */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards & Section Boxes */
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-color);
+        }
+
+        .card h2 {
+            color: var(--primary-blue);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eef2f5;
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h3 {
+            color: var(--secondary-blue);
+            font-size: 1.15rem;
+            margin: 15px 0 10px 0;
+        }
+
+        /* Color Scheme Highlights */
+        .lane-box {
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-left: 6px solid;
+            transition: transform 0.2s;
+        }
+
+        .lane-box:hover {
+            transform: translateX(4px);
+        }
+
+        .lane-green {
+            background-color: var(--green-light);
+            border-color: var(--green-main);
+            color: #1b5e20;
+        }
+
+        .lane-yellow {
+            background-color: var(--yellow-light);
+            border-color: var(--yellow-accent);
+            color: #e65100;
+        }
+
+        .lane-red {
+            background-color: var(--red-light);
+            border-color: var(--red-main);
+            color: #b71c1c;
+        }
+
+        /* Interactive Process Flow Chart */
+        .process-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .step-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--primary-blue);
+            padding: 15px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .step-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background-color: #f8fbff;
+        }
+
+        .step-title {
+            font-weight: bold;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .step-number {
+            background: var(--primary-blue);
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+
+        .step-detail {
+            display: none;
+            padding: 15px;
+            background: #f9fbfd;
+            border: 1px dashed var(--border-color);
+            border-top: none;
+            margin-top: -8px;
+            margin-bottom: 10px;
+            border-radius: 0 0 6px 6px;
+            font-size: 0.95rem;
+        }
+
+        /* VNACCS Simulator Styles */
+        .sim-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .sim-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background-color: var(--primary-blue); color: #fff; }
+        .btn-primary:hover { background-color: var(--secondary-blue); }
+        .btn-success { background-color: var(--green-main); color: #fff; }
+        .btn-success:hover { background-color: #1b5e20; }
+        .btn-warning { background-color: var(--yellow-accent); color: #fff; }
+        .btn-danger { background-color: var(--red-main); color: #fff; }
+
+        /* Result Panel in Simulator */
+        .result-panel {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-panel.active {
+            display: block;
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Tax Calculator Styles */
+        .calc-box {
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .calc-result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-weight: 500;
+        }
+
+        .calc-result-row.total {
+            border-bottom: 2px solid var(--primary-blue);
+            color: var(--red-main);
+            font-size: 1.15rem;
+            font-weight: bold;
+        }
+
+        /* Quiz & Test Styles */
+        .quiz-card {
+            border: 1px solid var(--border-color);
+            padding: 18px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            background-color: #fff;
+        }
+
+        .quiz-question {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--secondary-blue);
+        }
+
+        .quiz-options label {
+            display: block;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .quiz-options label:hover {
+            background-color: #f0f4f8;
+        }
+
+        .quiz-options input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .example-box {
+            background-color: #eef7fc;
+            border-left: 4px solid var(--primary-blue);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .example-title {
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-bottom: 5px;
+        }
+
+        .accordion-btn {
+            width: 100%;
+            text-align: left;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px;
+        }
+
+        .accordion-content {
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            display: none;
+            background: #fff;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .math-expr {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #0d47a1;
+            background-color: #e8eaf6;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        /* Modal Popup Pass GV */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-box {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            width: 320px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        /* Print Style for PDF Rendering */
+        #pdf-export-container {
+            padding: 20px;
+            background: #fff;
+            color: #000;
+            font-size: 13px;
+        }
+        .pdf-header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .pdf-student-info {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .pdf-item {
+            margin-bottom: 12px;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 8px;
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><i class="fa-solid fa-ship"></i> PHẦN MỀM THỦ TỤC & KIỂM TRA HẢI QUAN</h1>
+        <p>Hệ Thống Mô Phỏng Trực Quan Giảng Dạy Môn Khai Báo Hải Quan - Chương 5</p>
+    </header>
+
+    <nav>
+        <div class="nav-container">
+            <button class="nav-btn active" onclick="switchTab('theory', this)"><i class="fa-solid fa-book-open"></i> Lý Thuyết Trọng Tâm</button>
+            <button class="nav-btn" onclick="switchTab('flow', this)"><i class="fa-solid fa-diagram-project"></i> Quy Trình Thông Quan (7 Bước)</button>
+            <button class="nav-btn" onclick="switchTab('simulator', this)"><i class="fa-solid fa-desktop"></i> Mô Phỏng Phân Luồng VNACCS</button>
+            <button class="nav-btn" onclick="switchTab('calculator', this)"><i class="fa-solid fa-calculator"></i> Tính Thuế Hải Quan</button>
+            <button class="nav-btn" onclick="switchTab('exercises', this)"><i class="fa-solid fa-pen-to-square"></i> Bài Tập & Tình Huống TH (28 Bài)</button>
+            <button class="nav-btn" onclick="switchTab('exam', this)"><i class="fa-solid fa-file-signature"></i> Kiểm Tra Luyện Tập (30 Bài)</button>
+            <button class="nav-btn btn-gv-tab" onclick="openGvModal()"><i class="fa-solid fa-user-lock"></i> GV</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- TAB 1: LÝ THUYẾT TRỌNG TÂM -->
+        <div id="theory" class="tab-content active">
+            <div class="card">
+                <h2><i class="fa-solid fa-bullseye"></i> 1. Mục Tiêu Môn Học & Căn Cứ Pháp Lý</h2>
+                <p>Nội dung dựa trên Chương 5: Thủ tục hải quan và kiểm tra, giám sát hải quan (Luật Hải quan 2014, Nghị định 08/2015/NĐ-CP, Nghị định 59/2018/NĐ-CP, Thông tư 38/2015/TT-BTC & Thông tư 39/2018/TT-BTC).</p>
+                <div style="display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 280px; background: #e3f2fd; padding: 15px; border-radius: 6px;">
+                        <h4 style="color: #1565c0;"><i class="fa-solid fa-graduation-cap"></i> Kiến Thức</h4>
+                        <ul style="margin-left: 20px; font-size: 0.9rem;">
+                            <li>Khái niệm, nguyên tắc & cơ sở pháp lý thủ tục hải quan.</li>
+                            <li>Thành phần hồ sơ xuất khẩu, nhập khẩu.</li>
+                            <li>Cơ chế phân luồng rủi ro (Xanh - Vàng - Đỏ).</li>
+                            <li>Nghiệp vụ kiểm tra, giám sát, phúc tập & KTSTQ.</li>
+                        </ul>
+                    </div>
+                    <div style="flex: 1; min-width: 280px; background: #e8f5e9; padding: 15px; border-radius: 6px;">
+                        <h4 style="color: #2e7d32;"><i class="fa-solid fa-gears"></i> Kỹ Năng</h4>
+                        <ul style="margin-left: 20px; font-size: 0.9rem;">
+                            <li>Khai báo & kiểm tra chứng từ bộ hồ sơ hải quan.</li>
+                            <li>Thực hành tính thuế XNK & VAT chuẩn xác.</li>
+                            <li>Xử lý tình huống phân luồng & kiểm tra thực tế.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fa-solid fa-traffic-light"></i> 2. Hệ Thống 3 Luồng Trong Quản Lý Rủi Ro</h2>
+                <p style="margin-bottom: 15px;">Hệ thống VNACCS/VCIS phân luồng dựa trên mức độ tuân thủ của DN, lịch sử vi phạm và mức độ rủi ro của mặt hàng:</p>
+                
+                <div class="lane-box lane-green">
+                    <h3><i class="fa-solid fa-circle-check"></i> LUỒNG XANH (Green Channel) - Miễn Kiểm Tra</h3>
+                    <p><strong>Nội dung:</strong> Miễn kiểm tra chi tiết hồ sơ giấy và miễn kiểm tra thực tế hàng hóa. Tờ khai được hệ thống chấp nhận thông quan tự động sau khi hoàn thành nghĩa vụ thuế/lệ phí.</p>
+                    <p><strong>Áp dụng:</strong> Doanh nghiệp ưu tiên (AEO), doanh nghiệp tuân thủ tốt pháp luật, mặt hàng rủi ro thấp.</p>
+                </div>
+
+                <div class="lane-box lane-yellow">
+                    <h3><i class="fa-solid fa-triangle-exclamation"></i> LUỒNG VÀNG (Yellow Channel) - Kiểm Tra Hồ Sơ</h3>
+                    <p><strong>Nội dung:</strong> Kiểm tra chi tiết hồ sơ hải quan (Invoice, B/L, C/O, Giấy phép...). Miễn kiểm tra thực tế hàng hóa.</p>
+                    <p><strong>Áp dụng:</strong> Hàng hóa thuộc diện quản lý chuyên ngành, nghi ngờ trị giá/mã HS/C/O, hoặc DN có mức độ tuân thủ trung bình.</p>
+                </div>
+
+                <div class="lane-box lane-red">
+                    <h3><i class="fa-solid fa-triangle-exclamation"></i> LUỒNG ĐỎ (Red Channel) - Kiểm Tra Hồ Sơ & Thực Tế Hàng Hóa</h3>
+                    <p><strong>Nội dung:</strong> Kiểm tra chi tiết bộ hồ sơ hải quan VÀ tiến hành kiểm tra thực tế hàng hóa (bằng máy soi container hoặc mở kiểm thủ công 5%, 10% hoặc 100%).</p>
+                    <p><strong>Áp dụng:</strong> DN mới thành lập, DN có lịch sử vi phạm, mặt hàng nhạy cảm (hóa chất, nguy cơ cháy nổ, đồ gỗ, thực phẩm đông lạnh...), nghi gian lận thương mại.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fa-solid fa-folder-open"></i> 3. Bộ Hồ Sơ Hải Quan Chuẩn</h2>
+                <div class="sim-grid">
+                    <div style="border: 1px solid #e0e0e0; padding: 15px; border-radius: 6px;">
+                        <h3 style="color: var(--primary-blue);"><i class="fa-solid fa-file-export"></i> Hồ Sơ Xuất Khẩu</h3>
+                        <ul style="margin-left: 20px; line-height: 1.8; font-size: 0.95rem;">
+                            <li>Tờ khai hải quan xuất khẩu (VNACCS)</li>
+                            <li>Hóa đơn thương mại (Commercial Invoice)</li>
+                            <li>Bảng kê đóng gói (Packing List)</li>
+                            <li>Hợp đồng mua bán (Sales Contract - nếu có)</li>
+                            <li>Giấy chứng nhận xuất xứ (C/O) - nếu cần</li>
+                            <li>Giấy phép XK / Kiểm dịch chuyên ngành (nếu có)</li>
+                        </ul>
+                    </div>
+                    <div style="border: 1px solid #e0e0e0; padding: 15px; border-radius: 6px;">
+                        <h3 style="color: var(--secondary-blue);"><i class="fa-solid fa-file-import"></i> Hồ Sơ Nhập Khẩu</h3>
+                        <ul style="margin-left: 20px; line-height: 1.8; font-size: 0.95rem;">
+                            <li>Tờ khai hải quan nhập khẩu (VNACCS)</li>
+                            <li>Hóa đơn thương mại (Commercial Invoice)</li>
+                            <li>Vận tải đơn (Bill of Lading / Airway Bill)</li>
+                            <li>Bảng kê đóng gói (Packing List)</li>
+                            <li>Giấy chứng nhận xuất xứ (C/O Form E, AK, EUR.1...)</li>
+                            <li>Giấy đăng ký/kết quả kiểm tra chuyên ngành (Chất lượng, ATTP, Kiểm dịch)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fa-solid fa-magnifying-glass"></i> 4. Nghiệp Vụ Giám Sát, Phúc Tập & Kiểm Tra Sau Thông Quan</h2>
+                <div class="accordion">
+                    <button class="accordion-btn" onclick="toggleAccordion('acc1')"><span><i class="fa-solid fa-eye"></i> Nghiệp Vụ Giám Sát Hải Quan</span> <i class="fa-solid fa-chevron-down"></i></button>
+                    <div id="acc1" class="accordion-content">
+                        Theo dõi, kiểm soát hàng hóa/phương tiện từ khi vào khu vực giám sát đến khi hoàn thành thông quan. Sử dụng Seal hải quan, E-Seal, GPS, camera quan sát, máy soi container.
+                    </div>
+                </div>
+                <div class="accordion" style="margin-top: 10px;">
+                    <button class="accordion-btn" onclick="toggleAccordion('acc2')"><span><i class="fa-solid fa-file-shield"></i> Phúc Tập Hồ Sơ Hải Quan</span> <i class="fa-solid fa-chevron-down"></i></button>
+                    <div id="acc2" class="accordion-content">
+                        Kiểm tra lại hồ sơ đã thông quan nhằm đánh giá chất lượng xử lý của công chức hải quan, phát hiện sai sót nghiệp vụ (không tác động trực tiếp đến hàng đã thông quan, không làm phát sinh nghĩa vụ mới trừ khi truy thu).
+                    </div>
+                </div>
+                <div class="accordion" style="margin-top: 10px;">
+                    <button class="accordion-btn" onclick="toggleAccordion('acc3')"><span><i class="fa-solid fa-building-circle-check"></i> Kiểm Tra Sau Thông Quan (PCA)</span> <i class="fa-solid fa-chevron-down"></i></button>
+                    <div id="acc3" class="accordion-content">
+                        Thực hiện tại trụ sở Hải quan hoặc trụ sở Doanh nghiệp nhằm đánh giá tính tuân thủ pháp luật, phát hiện gian lận giá, mã HS, C/O, truy thu thuế và xử phạt vi phạm hành chính (NĐ 128/2020/NĐ-CP).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: QUY TRÌNH THÔNG QUAN 7 BƯỚC -->
+        <div id="flow" class="tab-content">
+            <div class="card">
+                <h2><i class="fa-solid fa-diagram-project"></i> Quy Trình Thông Quan Hàng Hóa Chuẩn (07 Bước)</h2>
+                <p>Click vào từng bước dưới đây để xem nội dung chi tiết nghiệp vụ trực quan:</p>
+                
+                <div class="process-flow">
+                    <div class="step-card" onclick="toggleStep(1)">
+                        <div class="step-title"><span class="step-number">1</span> Bước 1: Khai Tờ Khai Hải Quan</div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div id="step-1" class="step-detail">
+                        <strong>Nội dung:</strong> Người khai hải quan nhập dữ liệu hóa đơn, hợp đồng, packing list lên phần mềm VNACCS/VCIS (ECUS5/FPT) và phát hành tờ khai. Hệ thống tự động cấp số tờ khai.
+                    </div>
+
+                    <div class="step-card" onclick="toggleStep(2)">
+                        <div class="step-title"><span class="step-number">2</span> Bước 2: Tiếp Nhận & Kiểm Tra Hồ Sơ Tự Động</div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div id="step-2" class="step-detail">
+                        <strong>Nội dung:</strong> Hệ thống kiểm tra tính logic của dữ liệu (mã HS, trị giá, thuế suất, thông tin đối tác). Nếu đúng logic, hệ thống tiến hành đối chiếu dữ liệu quản lý rủi ro.
+                    </div>
+
+                    <div class="step-card" onclick="toggleStep(3)">
+                        <div class="step-title"><span class="step-number">3</span> Bước 3: Phân Luồng Kiểm Tra (Xanh / Vàng / Đỏ)</div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div id="step-3" class="step-detail">
+                        <strong>Nội dung:</strong> Hệ thống trả kết quả phân luồng:
+                        <ul style="margin-left: 20px;">
+                            <li style="color: green;"><strong>Luồng Xanh:</strong> Miễn kiểm tra hồ sơ & miễn kiểm tra hàng. Chuyển sang nộp thuế/thông quan.</li>
+                            <li style="color: #d97706;"><strong>Luồng Vàng:</strong> Xuất trình bộ hồ sơ giấy/điện tử cho công chức Hải quan kiểm tra.</li>
+                            <li style="color: red;"><strong>Luồng Đỏ:</strong> Kiểm tra hồ sơ giấy + Mở kiểm tra thực tế hàng hóa (máy soi/thủ công).</li>
+                        </ul>
+                    </div>
+
+                    <div class="step-card" onclick="toggleStep(4)">
+                        <div class="step-title"><span class="step-number">4</span> Bước 4: Kiểm Tra Thực Tế Hàng Hóa (Nếu Luồng Đỏ)</div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div id="step-4" class="step-detail">
+                        <strong>Nội dung:</strong> Công chức hải quan tiến hành soi container hoặc mở 5%, 10% hoặc 100% lô hàng để kiểm tra chủng loại, số lượng, nhãn hiệu, xuất xứ, tình trạng hàng hóa đối chiếu với khai báo.
+                    </div>
+
+                    <div class="step-card" onclick="toggleStep(5)">
+                        <div class="step-title"><span class="step-number">5</span> Bước 5: Xác Định Thuế & Nộp Thuế</div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div id="step-5" class="step-detail">
+                        <strong>Nội dung:</strong> Xác định chính xác trị giá tính thuế (CIF/FOB), áp mã HS và thuế suất. Doanh nghiệp thực hiện nộp thuế qua Ngân hàng thương mại/Cổng thanh toán điện tử 24/7.
+                    </div>
+
+                    <div class="step-card" onclick="toggleStep(6)">
+                        <div class="step-title"><span class="step-number">6</span> Bước 6: Quyết Định Thông Quan Hàng Hóa</div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div id="step-6" class="step-detail">
+                        <strong>Nội dung:</strong> Khi hồ sơ hợp lệ, hàng hóa khớp khai báo và tiền thuế đã cập nhật vào hệ thống Hải quan, công chức hải quan duyệt "Thông quan" trên hệ thống.
+                    </div>
+
+                    <div class="step-card" onclick="toggleStep(7)">
+                        <div class="step-title"><span class="step-number">7</span> Bước 7: Đưa Hàng Ra Khỏi Khu Vực Giám Sát</div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div id="step-7" class="step-detail">
+                        <strong>Nội dung:</strong> Doanh nghiệp in Tờ khai thông quan + Lấy Mã vạch (BarCode) thanh lý hải quan giám sát port/kho, nhận E-Delivery Order lấy hàng về kho.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: MÔ PHỎNG PHÂN LUỒNG VNACCS -->
+        <div id="simulator" class="tab-content">
+            <div class="card">
+                <h2><i class="fa-solid fa-laptop-code"></i> Hệ Thống Mô Phỏng Phân Luồng Tờ Khai Hải Quan VNACCS</h2>
+                <p style="margin-bottom: 20px;">Sinh viên hãy nhập thông tin giả định của lô hàng để trải nghiệm cơ chế tự động đánh giá rủi ro và phân luồng của cơ quan Hải quan:</p>
+                
+                <div class="sim-grid">
+                    <div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-building"></i> Loại Hình Doanh Nghiệp & Lịch Sử Tuân Thủ:</label>
+                            <select id="sim-dn">
+                                <option value="aeo">DN Ưu Tiên (AEO) - Tuân thủ rất cao</option>
+                                <option value="good" selected>DN Chấp hành tốt (Hoạt động > 3 năm, không vi phạm)</option>
+                                <option value="new">DN Mới thành lập / Hoạt động dưới 1 năm</option>
+                                <option value="violator">DN Có lịch sử vi phạm / Khai sai trong 6 tháng qua</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-box-archive"></i> Loại Mặt Hàng Khai Báo:</label>
+                            <select id="sim-goods">
+                                <option value="normal">Hàng thường (May mặc, Giày dép, Đồ nhựa dân dụng)</option>
+                                <option value="special">Hàng kiểm tra chuyên ngành (Thiết bị y tế, Thực phẩm, Máy bơm QCVN)</option>
+                                <option value="risk">Mặt hàng rủi ro cao (Hóa chất dễ cháy, Động cơ, Rượu, Gỗ xẻ)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-file-invoice-dollar"></i> Khai Báo Trị Giá Hải Quan:</label>
+                            <select id="sim-price">
+                                <option value="match">Phù hợp giá thị trường & CSDL giá Hải quan</option>
+                                <option value="low">Khai thấp bất thường (Chỉ bằng 50-60% giá thị trường)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-certificate"></i> Chứng Nhận Xuất Xứ (C/O):</label>
+                            <select id="sim-co">
+                                <option value="valid">C/O hợp lệ đầy đủ (Form E, AK, EUR.1...)</option>
+                                <option value="suspect">C/O có nghi vấn (Sai font, lệch chữ ký, thiếu thông tin)</option>
+                                <option value="none">Không có C/O</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="runSimulation()">
+                            <i class="fa-solid fa-paper-plane"></i> GỬI TỜ KHAI LÊN HỆ THỐNG VNACCS
+                        </button>
+                    </div>
+
+                    <div>
+                        <div id="result-box" class="result-panel">
+                            <h3 id="result-title" style="font-size: 1.5rem; margin-bottom: 10px;"></h3>
+                            <p id="result-desc" style="font-size: 1rem; margin-bottom: 15px;"></p>
+                            <div id="result-action" style="text-align: left; padding: 12px; background: rgba(255,255,255,0.7); border-radius: 6px; font-size: 0.9rem;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: TÍNH THUẾ HẢI QUAN -->
+        <div id="calculator" class="tab-content">
+            <div class="card">
+                <h2><i class="fa-solid fa-calculator"></i> Công Cụ Tính Thuế Hải Quan & VAT Lô Hàng</h2>
+                <p style="margin-bottom: 15px;">Dựa trên công thức chuẩn GATT/WTO trong Chương 5:</p>
+                <div class="example-box">
+                    <div class="example-title"><i class="fa-solid fa-lightbulb"></i> Công Thức Tính Thuế Trọng Tâm:</div>
+                    <p>• Trị giá tính thuế (CIF) = <span class="math-expr">FOB + Cước VC (F) + Bảo hiểm (I)</span> (quy đổi sang VND theo Tỷ giá tính thuế)</p>
+                    <p>• Thuế Nhập khẩu = <span class="math-expr">Trị giá CIF (VND) × Thuế suất NK (%)</span></p>
+                    <p>• Trị giá tính thuế VAT = <span class="math-expr">Trị giá CIF + Thuế NK + Thuế TTĐB (nếu có)</span></p>
+                    <p>• Thuế VAT = <span class="math-expr">Trị giá tính VAT × Thuế suất VAT (%)</span></p>
+                </div>
+
+                <div class="sim-grid" style="margin-top: 20px;">
+                    <div class="calc-box">
+                        <h3 style="margin-bottom: 15px; color: var(--primary-blue);">Dữ Liệu Khai Báo</h3>
+                        <div class="form-group">
+                            <label>Trị giá FOB / Nguyên giá (USD/EUR):</label>
+                            <input type="number" id="calc-fob" value="50000" oninput="calculateTax()">
+                        </div>
+                        <div class="form-group">
+                            <label>Cước vận chuyển F + Bảo hiểm I (USD/EUR):</label>
+                            <input type="number" id="calc-freight" value="0" oninput="calculateTax()">
+                        </div>
+                        <div class="form-group">
+                            <label>Tỷ giá tính thuế (VND / Ngoại tệ):</label>
+                            <input type="number" id="calc-rate" value="25000" oninput="calculateTax()">
+                        </div>
+                        <div class="form-group">
+                            <label>Thuế suất Nhập khẩu (%):</label>
+                            <input type="number" id="calc-nk-rate" value="5" oninput="calculateTax()">
+                        </div>
+                        <div class="form-group">
+                            <label>Thuế suất VAT (%):</label>
+                            <input type="number" id="calc-vat-rate" value="10" oninput="calculateTax()">
+                        </div>
+                    </div>
+
+                    <div class="calc-box">
+                        <h3 style="margin-bottom: 15px; color: var(--green-main);">Kết Quả Tính Thuế Chi Tiết</h3>
+                        <div class="calc-result-row">
+                            <span>Trị giá CIF (Ngoại tệ):</span>
+                            <span id="res-cif-foreign">50,000.00</span>
+                        </div>
+                        <div class="calc-result-row">
+                            <span>Trị giá tính thuế CIF (VND):</span>
+                            <span id="res-cif-vnd">1,250,000,000 VND</span>
+                        </div>
+                        <div class="calc-result-row">
+                            <span>Số tiền Thuế Nhập Khẩu:</span>
+                            <span id="res-tax-nk" style="color: #d97706;">62,500,000 VND</span>
+                        </div>
+                        <div class="calc-result-row">
+                            <span>Giá tính thuế VAT:</span>
+                            <span id="res-base-vat">1,312,500,000 VND</span>
+                        </div>
+                        <div class="calc-result-row">
+                            <span>Số tiền Thuế Giá Trị Gia Tăng (VAT):</span>
+                            <span id="res-tax-vat" style="color: #d97706;">131,250,000 VND</span>
+                        </div>
+                        <div class="calc-result-row total">
+                            <span>TỔNG THUẾ PHẢI NỘP:</span>
+                            <span id="res-tax-total">193,750,000 VND</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: BÀI TẬP VÀ TÌNH HUỐNG THỰC HÀNH (28 BÀI) -->
+        <div id="exercises" class="tab-content">
+            <div class="card">
+                <h2><i class="fa-solid fa-list-check"></i> Ngân Hàng Bài Tập & Tình Huống Thực Hành (28 Bài Tập)</h2>
+                <p style="margin-bottom: 15px;">Dưới đây là đáp án chi tiết và giải trình hướng dẫn giảng dạy cho toàn bộ 28 bài tập thực hành trong giáo trình Chương 5:</p>
+                <div id="exercise-list"></div>
+            </div>
+        </div>
+
+        <!-- TAB 6: KIỂM TRA LUYỆN TẬP (30 BÀI TẬP BỔ SUNG) -->
+        <div id="exam" class="tab-content">
+            <div class="card">
+                <h2><i class="fa-solid fa-file-signature"></i> TAB KIỂM TRA - HỆ THỐNG 30 BÀI TẬP LUYỆN TẬP CHƯƠNG</h2>
+                <p style="margin-bottom: 15px;">Sinh viên điền thông tin cá nhân, thực hiện làm bài trực tiếp trên màn hình, sau đó bấm nút Kết Xuất để tải file PDF nộp cho Giảng viên.</p>
+                
+                <div style="background: #f0f7ff; padding: 15px; border-radius: 6px; border: 1px solid #b6e0fe; margin-bottom: 20px;">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <label style="font-weight: bold; display: block; margin-bottom: 5px;">HỌ VÀ TÊN SINH VIÊN (*):</label>
+                            <input type="text" id="student-name" placeholder="Nhập họ và tên đầy đủ..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div style="flex: 1; min-width: 250px;">
+                            <label style="font-weight: bold; display: block; margin-bottom: 5px;">MÃ SỐ SINH VIÊN (*):</label>
+                            <input type="text" id="student-id" placeholder="Nhập MSSV..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control Buttons for PDF Export -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button class="btn btn-success" onclick="exportPDF('portrait')"><i class="fa-solid fa-file-pdf"></i> KẾT XUẤT BÀI LÀM (PDF TRANG A4 DỌC)</button>
+                    <button class="btn btn-warning" onclick="exportPDF('landscape')"><i class="fa-solid fa-file-pdf"></i> KẾT XUẤT BÀI LÀM (PDF TRANG A4 NGANG)</button>
+                </div>
+
+                <!-- 30 Test Questions List Container -->
+                <div id="exam-questions-list"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL ĐĂNG NHẬP PASS GV -->
+    <div id="gv-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 style="color: var(--primary-blue); margin-bottom: 10px;"><i class="fa-solid fa-user-shield"></i> XÁC NHẬN GIẢNG VIÊN</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 15px;">Vui lòng nhập mật khẩu để xem đáp án Tab Kiểm Tra (30 bài):</p>
+            <input type="password" id="gv-pass-input" placeholder="Mật khẩu..." style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; text-align: center;">
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn btn-primary" onclick="checkGvPass()">Xác Nhận</button>
+                <button class="btn btn-danger" onclick="closeGvModal()">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System Global State
+        let isGvUnlocked = false;
+
+        // Tab Switching Function
+        function switchTab(tabId, btnEl) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            if (btnEl) btnEl.classList.add('active');
+        }
+
+        // Accordion Toggle
+        function toggleAccordion(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === 'block') {
+                el.style.display = 'none';
+            } else {
+                el.style.display = 'block';
+            }
+        }
+
+        // Step Toggle in Process Flow
+        function toggleStep(stepNum) {
+            const detail = document.getElementById('step-' + stepNum);
+            if (detail.style.display === 'block') {
+                detail.style.display = 'none';
+            } else {
+                detail.style.display = 'block';
+            }
+        }
+
+        // VNACCS Simulation Logic
+        function runSimulation() {
+            const dn = document.getElementById('sim-dn').value;
+            const goods = document.getElementById('sim-goods').value;
+            const price = document.getElementById('sim-price').value;
+            const co = document.getElementById('sim-co').value;
+
+            const resBox = document.getElementById('result-box');
+            const resTitle = document.getElementById('result-title');
+            const resDesc = document.getElementById('result-desc');
+            const resAction = document.getElementById('result-action');
+
+            resBox.className = 'result-panel active';
+
+            if (dn === 'violator' || goods === 'risk' || price === 'low' || co === 'suspect') {
+                resBox.classList.add('lane-red');
+                resTitle.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> HỆ THỐNG PHÂN LUỒNG ĐỎ';
+                resDesc.innerText = 'Tờ khai được phân vào LUỒNG ĐỎ. Yêu cầu Kiểm tra chi tiết Hồ sơ hải quan VÀ Kiểm tra thực tế hàng hóa.';
+                
+                let reasons = [];
+                if (dn === 'violator') reasons.push('Doanh nghiệp có lịch sử vi phạm/khai sai.');
+                if (goods === 'risk') reasons.push('Mặt hàng thuộc nhóm rủi ro cao (hóa chất/dễ cháy/gỗ...).');
+                if (price === 'low') reasons.push('Nghi vấn khai thấp trị giá tính thuế.');
+                if (co === 'suspect') reasons.push('C/O có dấu hiệu nghi vấn bất thường.');
+
+                resAction.innerHTML = `<strong>Lý do phân luồng:</strong> ${reasons.join(' ')}<br>
+                <strong>Hướng xử lý:</strong><br>
+                1. Nộp bộ hồ sơ giấy/điện tử cho Hải quan kiểm tra.<br>
+                2. Sắp xếp hàng hóa tại cảng/kho để Hải quan tiến hành kiểm tra bằng máy soi hoặc kiểm tra thủ công (5%, 10% hoặc 100%).<br>
+                3. Hoàn thành nghĩa vụ thuế trước khi thông quan.`;
+
+            } else if (goods === 'special' || (dn === 'new' && goods === 'normal')) {
+                resBox.classList.add('lane-yellow');
+                resTitle.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> HỆ THỐNG PHÂN LUỒNG VÀNG';
+                resDesc.innerText = 'Tờ khai được phân vào LUỒNG VÀNG. Yêu cầu Kiểm tra chi tiết Hồ sơ hải quan (Miễn kiểm tra thực tế hàng hóa).';
+                
+                resAction.innerHTML = `<strong>Lý do phân luồng:</strong> Hàng hóa thuộc diện quản lý chuyên ngành / DN mới cần xác minh hồ sơ.<br>
+                <strong>Hướng xử lý:</strong><br>
+                1. Xuất trình bộ chứng từ (Invoice, B/L, C/O, Giấy chứng nhận chất lượng/kiểm dịch) trên hệ thống/quầy làm thủ tục.<br>
+                2. Sau khi công chức Hải quan duyệt hồ sơ đạt yêu cầu, tiến hành nộp thuế để nhận quyết định Thông Quan.`;
+
+            } else {
+                resBox.classList.add('lane-green');
+                resTitle.innerHTML = '<i class="fa-solid fa-circle-check"></i> HỆ THỐNG PHÂN LUỒNG XANH';
+                resDesc.innerText = 'Tờ khai được phân vào LUỒNG XANH. MIỄN KIỂM TRA HỒ SƠ & MIỄN KIỂM TRA HÀNG HÓA.';
+                
+                resAction.innerHTML = `<strong>Lý do phân luồng:</strong> Doanh nghiệp chấp hành tốt pháp luật, hàng hóa thuộc nhóm rủi ro thấp.<br>
+                <strong>Hướng xử lý:</strong><br>
+                1. Hệ thống tự động phê duyệt thông quan ngay sau khi Doanh nghiệp hoàn thành nộp thuế & lệ phí hải quan.<br>
+                2. In bảng kê mã vạch (BarCode) để nhận hàng ra khỏi cảng.`;
+            }
+        }
+
+        // Tax Calculation Logic
+        function calculateTax() {
+            const fob = parseFloat(document.getElementById('calc-fob').value) || 0;
+            const freight = parseFloat(document.getElementById('calc-freight').value) || 0;
+            const rate = parseFloat(document.getElementById('calc-rate').value) || 0;
+            const nkRate = parseFloat(document.getElementById('calc-nk-rate').value) || 0;
+            const vatRate = parseFloat(document.getElementById('calc-vat-rate').value) || 0;
+
+            const cifForeign = fob + freight;
+            const cifVnd = cifForeign * rate;
+            const taxNk = cifVnd * (nkRate / 100);
+            const baseVat = cifVnd * (1 + nkRate / 100);
+            const taxVat = baseVat * (vatRate / 100);
+            const totalTax = taxNk + taxVat;
+
+            document.getElementById('res-cif-foreign').innerText = cifForeign.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' USD/EUR';
+            document.getElementById('res-cif-vnd').innerText = Math.round(cifVnd).toLocaleString('vi-VN') + ' VND';
+            document.getElementById('res-tax-nk').innerText = Math.round(taxNk).toLocaleString('vi-VN') + ' VND';
+            document.getElementById('res-base-vat').innerText = Math.round(baseVat).toLocaleString('vi-VN') + ' VND';
+            document.getElementById('res-tax-vat').innerText = Math.round(taxVat).toLocaleString('vi-VN') + ' VND';
+            document.getElementById('res-tax-total').innerText = Math.round(totalTax).toLocaleString('vi-VN') + ' VND';
+        }
+
+        // 28 Practical Exercises Data
+        const exercisesData = [
+            { id: 1, title: "Bài 1: Tính thuế lô hàng Thiết bị đo áp suất từ Đức", detail: "Công ty Hoàng Gia NK lô hàng FOB 20.000 EUR, Freight 1.500 EUR, C/O EUR.1 (Thuế NK 0%), VAT 10%. Tỷ giá giả định 27.000 VND/EUR.", solution: "• Trị giá CIF = 20.000 + 1.500 = 21.500 EUR = 580.500.000 VND.<br>• Thuế NK = 580.500.000 × 0% = 0 VND.<br>• Thuế VAT = 580.500.000 × 10% = 58.050.000 VND.<br>• <strong>Tổng thuế nộp: 58.050.000 VND.</strong>" },
+            { id: 2, title: "Bài 2: Dự đoán phân luồng DN mới NK hóa chất công nghiệp", detail: "DN mới thành lập, nhập khẩu mặt hàng hóa chất nhạy cảm về an toàn môi trường.", solution: "• <strong>Dự đoán phân luồng:</strong> LUỒNG ĐỎ. Lý do: DN chưa có lịch sử tuân thủ + mặt hàng rủi ro cao về an toàn/môi trường." },
+            { id: 3, title: "Bài 3: Tính thuế & Quy trình Luồng Vàng cho lô Máy nén khí", detail: "20 bộ Máy nén khí, Giá CIF 80.000 USD, Thuế NK 5%, VAT 10%, Tỷ giá 25.200 VND/USD.", solution: "• Trị giá CIF (VND) = 80.000 × 25.200 = 2.016.000.000 VND.<br>• Thuế NK = 2.016.000.000 × 5% = 100.800.000 VND.<br>• Giá tính VAT = 2.116.800.000 VND -> Thuế VAT = 211.680.000 VND.<br>• <strong>Tổng thuế: 312.480.000 VND.</strong>" },
+            { id: 4, title: "Bài 4: Xử lý chênh lệch thừa 150 linh kiện điện tử khi kiểm tra Luồng Đỏ", detail: "Khai 10.000 cái, thực tế 10.150 cái. CIF khai báo 0.8 USD/cái, Thuế NK 3%, VAT 10%, Tỷ giá 25.000 VND/USD.", solution: "• Trị giá CIF 150 cái thừa = 3.000.000 VND.<br>• Thuế NK = 90.000 VND, VAT = 309.000 VND -> <strong>Tổng thuế nộp thêm: 399.000 VND.</strong>" },
+            { id: 5, title: "Bài 5: Xuất khẩu thủy sản bị luồng vàng thiếu Giấy Kiểm Dịch", detail: "Công ty Minh Phúc XK thủy sản bị thiếu Giấy kiểm dịch.", solution: "• Đăng ký lấy mẫu kiểm dịch tại Cơ quan Kiểm dịch. Nộp bổ sung bản chứng nhận lên VNACCS để được thông quan." },
+            { id: 6, title: "Bài 6: Phân tích rủi ro lô Dung môi công nghiệp Ethyl Acetate", detail: "Hàng nguy cơ cháy nổ, DN từng khai sai mã HS trong 6 tháng qua.", solution: "• Dự đoán: Phân <strong>Luồng Đỏ 100%</strong> (Mặt hàng nguy hiểm + Lịch sử vi phạm)." },
+            { id: 7, title: "Bài 7: Nghi vấn khai thấp giá Máy CNC (chỉ bằng 60% thị trường)", detail: "Hải quan nghi ngờ trị giá khai báo.", solution: "• HQ có quyền yêu cầu tham vấn giá. DN xuất trình chứng từ thanh toán ngân hàng, hợp đồng, bảng giá hãng." },
+            { id: 8, title: "Bài 8: Kiểm tra sau thông quan lô hàng nghi sai mã HS", detail: "Trình bày quy trình, quyền/nghĩa vụ DN.", solution: "• KTSTQ rà soát hồ sơ, sổ sách kế toán trong vòng 5 năm để đánh giá tuân thủ và truy thu thuế nếu khai sai." },
+            { id: 9, title: "Bài 9: Nhập khẩu Gỗ xẻ thông thiếu Giấy kiểm dịch thực vật", detail: "Chưa có kiểm dịch khi làm thủ tục.", solution: "• Cho phép đưa hàng về kho bảo quản niêm phong chờ kết quả kiểm dịch trước khi cấp thông quan." },
+            { id: 10, title: "Bài 10: Tự phát hiện khai sai thuế suất NK (5% -> 10%) sau 1 tuần", detail: "Tờ khai đã thông quan.", solution: "• Thực hiện Khai bổ sung (AMA), nộp thuế thiếu + Tiền chậm nộp (0.03%/ngày). Miễn phạt vi phạm hành chính." },
+            { id: 11, title: "Bài 11: Kiểm tra thực tế thừa 80 cuộn vải", detail: "Giá CIF 10 USD/cuộn, Thuế NK 12%, VAT 10%, Tỷ giá 25.100 VND/USD.", solution: "• CIF 80 cuộn = 20.080.000 VND -> Thuế NK = 2.409.600 VND, VAT = 2.248.960 VND. <strong>Tổng nộp thêm: 4.658.560 VND.</strong>" },
+            { id: 12, title: "Bài 12: Chuyển luồng từ Xanh sang Đỏ do nghi ngờ mã HS", detail: "Cán bộ hải quan chuyển luồng.", solution: "• HQ có quyền chuyển luồng khi có thông tin nghi vấn rủi ro đột xuất theo Luật Hải quan." },
+            { id: 13, title: "Bài 13: C/O Form AI bị sai số container", detail: "Doanh nghiệp xin đưa hàng về gấp.", solution: "• Tạm nộp thuế theo thuế suất MFN để giải phóng hàng, sau đó nộp C/O sửa đổi trong 30 ngày để hoàn thuế." },
+            { id: 14, title: "Bài 14: Hoàn thuế NK 200 bộ máy tính bị lỗi trả lại nước ngoài", detail: "Đã nộp thuế 10%.", solution: "• DN được hoàn thuế NK đã nộp tương ứng với số hàng thực tế tái xuất trả nhà cung cấp." },
+            { id: 15, title: "Bài 15: Bị ấn định thuế do áp lại mã HS (8501 0% -> 8503 5%)", detail: "Ấn định thuế Động cơ servo.", solution: "• Nộp tiền thuế ấn định chênh lệch 5% + Tiền chậm nộp. DN có quyền khiếu nại kèm kết quả giám định." },
+            { id: 16, title: "Bài 16: Quy trình kiểm tra chuyên ngành xuất khẩu Thanh long sang EU", detail: "Mẫu kiểm dịch thực vật.", solution: "• Lấy mẫu -> Kiểm nghiệm dư lượng thuốc BVTV -> Cấp C/O & Giấy kiểm dịch." },
+            { id: 17, title: "Bài 17: Xác minh C/O Form D nghi ngờ không đạt CTH", detail: "Nhập khẩu quần áo từ Campuchia.", solution: "• Thông quan theo thuế suất MFN và gửi văn bản xác minh đến cơ quan cấp C/O nước xuất khẩu." },
+            { id: 18, title: "Bài 18: Giám sát hàng Điện thoại quá cảnh Trung Quốc -> Lào", detail: "Nghi rủi ro quay đầu tiêu thụ.", solution: "• Niêm phong E-Seal điện tử, giám sát lộ trình qua GPS." },
+            { id: 19, title: "Bài 19: Đặc quyền của Doanh nghiệp ưu tiên (AEO)", detail: "Quyền lợi và trách nhiệm.", solution: "• Miễn kiểm tra chứng từ và kiểm tra thực tế hàng hóa, ưu tiên thông quan tự động." },
+            { id: 20, title: "Bài 20: Khai sai thiếu 500 hộp dược phẩm (20.000 USD)", detail: "Mức phạt theo NĐ 128/2020.", solution: "• Phạt 10-20% số tiền thuế trốn/thiếu + nộp đủ thuế truy thu." },
+            { id: 21, title: "Bài 21: Phân tích trường hợp phân luồng Máy in văn phòng", detail: "Xác định điều kiện luồng xanh, vàng, đỏ.", solution: "• Máy mới 100%: Luồng Xanh/Vàng; Máy cũ đã qua sử dụng: Luồng Đỏ (kiểm tra chặt)." },
+            { id: 22, title: "Bài 22: Đánh giá nguy cơ sai mã HS (Camera module 8525 vs Lens+Sensor)", detail: "Tờ khai 8525.80 vs Vận đơn.", solution: "• Phân luồng Vàng/Đỏ kiểm tra catalogue để phân biệt linh kiện rời và cụm camera hoàn chỉnh." },
+            { id: 23, title: "Bài 23: Dấu hiệu khai thấp giá bất thường từ bộ chứng từ", detail: "So sánh Invoice và CSDL giá.", solution: "• Khai thấp hơn >30% CSDL giá Hải quan -> Đưa vào danh sách nghi vấn tham vấn giá." },
+            { id: 24, title: "Bài 24: Kế hoạch giám sát 02 container linh kiện chuyển cửa khẩu", detail: "Chuyển từ Hải Phòng -> ICD Tân Cảng.", solution: "• Niêm phong seal hải quan, lập biên bản bàn giao giữa 2 chi cục." },
+            { id: 25, title: "Bài 25: Xử phạt DN nộp tờ khai muộn, sai HS", detail: "Áp dụng Nghị định 128/2020/NĐ-CP.", solution: "• Phạt hành chính nộp muộn + phạt 20% tiền thuế khai thiếu do sai mã HS." },
+            { id: 26, title: "Bài 26: Xử lý C/O Form E nghi ngờ chữ ký, font chữ", detail: "Quyết định xử lý.", solution: "• Tạm từ chối ưu đãi, tính thuế MFN, gửi xác minh C/O." },
+            { id: 27, title: "Bài 27: Xử lý 4 tình huống đặc biệt (Phí bản quyền, Hàng giả, Vũ khí, Kho nq)", detail: "Nghiệp vụ hải quan tổng hợp.", solution: "• Phí bản quyền: Cộng vào trị giá CIF. Hàng giả: Tạm dừng thông quan xử lý SHTT." },
+            { id: 28, title: "Bài 28: Xử lý điều chỉnh trị giá + Tiêu thụ nội địa NL SXXK", detail: "Tính thuế truy thu.", solution: "• Truy thu thuế NK + VAT cho phần tăng giá trị và phần nguyên liệu tự ý tiêu thụ nội địa." }
+        ];
+
+        // Render 28 Practical Exercises
+        function renderExercises() {
+            const listContainer = document.getElementById('exercise-list');
+            listContainer.innerHTML = '';
+            exercisesData.forEach(ex => {
+                const item = document.createElement('div');
+                item.className = 'quiz-card';
+                item.innerHTML = `
+                    <div class="quiz-question"><i class="fa-solid fa-file-pen"></i> ${ex.title}</div>
+                    <p style="font-size: 0.95rem; margin-bottom: 10px; color: #444;">${ex.detail}</p>
+                    <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;" onclick="toggleAccordion('ex-sol-${ex.id}')">
+                        <i class="fa-solid fa-key"></i> Xem Đáp Án & Hướng Dẫn Chi Tiết
+                    </button>
+                    <div id="ex-sol-${ex.id}" class="accordion-content" style="margin-top: 10px; background: #f0fdf4; border-color: #bbf7d0;">
+                        ${ex.solution}
+                    </div>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        // 30 EXAM TEST QUESTIONS DATA
+        const examQuestionsData = [
+            { id: 1, question: "Câu 1: Căn cứ theo Luật Hải quan 2014, thời hạn nộp tờ khai hải quan đối với hàng hóa nhập khẩu là:", options: ["Nộp trước ngày hàng hóa đến cửa khẩu hoặc trong thời hạn 30 ngày kể từ ngày hàng hóa đến cửa khẩu", "Nộp sau 45 ngày kể từ ngày hàng hóa đến cửa khẩu", "Nộp bất kỳ lúc nào trước khi bán hàng", "Nộp trong vòng 60 ngày kể từ ngày phát hành B/L"], correct: "A", explain: "Theo khoản 1 Điều 25 Luật Hải quan 2014, tờ khai nhập khẩu nộp trước hoặc trong 30 ngày kể từ ngày hàng đến cửa khẩu." },
+            { id: 2, question: "Câu 2: Hồ sơ hải quan đối với hàng hóa nhập khẩu thương mại thông thường KHÔNG bắt buộc phải có chứng từ nào sau đây?", options: ["Tờ khai hải quan & Hóa đơn thương mại (Commercial Invoice)", "Vận tải đơn (Bill of Lading)", "Giấy chứng nhận đăng ký kinh doanh bản chính của người mua", "Bảng kê đóng gói (Packing List)"], correct: "C", explain: "Giấy ĐKKD không nằm trong bộ hồ sơ hải quan bắt buộc cho từng lô hàng thông quan." },
+            { id: 3, question: "Câu 3: Kết quả phân luồng 'Luồng Xanh' trên hệ thống VNACCS có ý nghĩa gì?", options: ["Miễn kiểm tra chi tiết hồ sơ và miễn kiểm tra thực tế hàng hóa", "Kiểm tra chi tiết bộ chứng từ hồ sơ giấy", "Mở kiểm tra thực tế 100% lô hàng", "Chờ ý kiến chỉ đạo từ Bộ Tài chính"], correct: "A", explain: "Luồng xanh miễn kiểm tra hồ sơ và thực tế hàng hóa." },
+            { id: 4, question: "Câu 4: Khi tờ khai bị phân vào 'Luồng Vàng', người khai hải quan phải làm gì?", options: ["Đưa hàng về kho sử dụng ngay", "Xuất trình bộ hồ sơ hải quan (giấy/điện tử) để công chức hải quan kiểm tra chi tiết", "Yêu cầu mở container kiểm tra thực tế ngay", "Không cần làm gì cả"], correct: "B", explain: "Luồng vàng yêu cầu kiểm tra chi tiết bộ hồ sơ chứng từ." },
+            { id: 5, question: "Câu 5: Công thức tính Trị giá tính thuế Nhập khẩu đối với điều kiện giao hàng FOB là:", options: ["Trị giá CIF = FOB + Cước vận chuyển (F) + Phí bảo hiểm (I)", "Trị giá CIF = FOB - Cước vận chuyển (F)", "Trị giá CIF = FOB × Tỷ giá", "Trị giá CIF = FOB + Thuế VAT"], correct: "A", explain: "Trị giá tính thuế nhập khẩu theo giá CIF = FOB + F + I." },
+            { id: 6, question: "Câu 6: Trị giá tính thuế Giá trị gia tăng (VAT) cho hàng nhập khẩu được xác định bằng:", options: ["Trị giá CIF + Thuế Nhập khẩu + Thuế TTĐB (nếu có)", "Chỉ tính trên trị giá FOB", "Giá bán lẻ trên thị trường nội địa", "Trị giá CIF trừ thuế nhập khẩu"], correct: "A", explain: "Giá tính thuế VAT nhập khẩu = Trị giá CIF + Các khoản thuế khâu nhập khẩu (Thuế NK, Thuế TTĐB, Thuế BVMT...)." },
+            { id: 7, question: "Câu 7: Doanh nghiệp được công nhận là Doanh nghiệp ưu tiên (AEO) sẽ hưởng chế độ nào?", options: ["Được miễn kiểm tra hồ sơ và kiểm tra thực tế hàng hóa (trừ dấu hiệu vi phạm rõ ràng)", "Được miễn nộp tất cả các loại thuế nhập khẩu vĩnh viễn", "Không cần khai báo tờ khai hải quan", "Được tự do nhập khẩu hàng cấm"], correct: "A", explain: "DN AEO được ưu tiên thông quan, miễn kiểm tra chứng từ và thực tế hàng hóa." },
+            { id: 8, question: "Câu 8: Văn bản pháp lý cao nhất điều chỉnh hoạt động hải quan tại Việt Nam hiện nay là:", options: ["Luật Hải quan số 54/2014/QH13", "Thông tư 38/2015/TT-BTC", "Nghị định 08/2015/NĐ-CP", "Nghị định 128/2020/NĐ-CP"], correct: "A", explain: "Luật Hải quan 2014 do Quốc hội ban hành là văn bản Luật có giá trị pháp lý cao nhất." },
+            { id: 9, question: "Câu 9: Thời hạn kiểm tra sau thông quan (PCA) tại trụ sở người khai hải quan là tối đa bao nhiêu năm kể từ ngày đăng ký tờ khai?", options: ["05 năm", "01 năm", "02 năm", "10 năm"], correct: "A", explain: "Theo Luật Hải quan 2014, thời hạn kiểm tra sau thông quan là 05 năm." },
+            { id: 10, question: "Câu 10: Tỷ giá tính thuế hải quan áp dụng theo quy định hiện hành là tỷ giá nào?", options: ["Tỷ giá ngoại tệ do Ngân hàng TMCP Vietcombank công bố vào ngày thứ 5 tuần trước hoặc ngày làm việc cuối cùng trước thứ 5", "Tỷ giá do Doanh nghiệp tự thỏa thuận", "Tỷ giá do Ngân hàng Thế giới công bố", "Tỷ giá trung bình của cả năm"], correct: "A", explain: "Tỷ giá tính thuế lấy theo tỷ giá tỷ giá do VCB công bố chốt theo quy định của Tổng cục Hải quan." },
+            { id: 11, question: "Câu 11: Trường hợp C/O (Giấy chứng nhận xuất xứ) Form E bị nghi ngờ về tính hợp lệ, Chi cục Hải quan sẽ xử lý:", options: ["Tạm từ chối ưu đãi thuế, tính thuế theo thuế suất MFN và gửi xác minh C/O", "Hủy bỏ toàn bộ lô hàng", "Tịch thu hàng hóa", "Phạt tiền 100 triệu đồng ngay lập tức"], correct: "A", explain: "Cho thông quan theo thuế MFN và thực hiện thủ tục xác minh C/O với cơ quan cấp nước ngoài." },
+            { id: 12, question: "Câu 12: Hình thức kiểm tra thực tế hàng hóa thuộc Luồng Đỏ bao gồm:", options: ["Kiểm tra qua máy soi container hoặc mở kiểm thủ công (5%, 10% hoặc 100%)", "Chỉ xem ảnh chụp hàng hóa", "Chỉ kiểm tra niêm phong seal", "Không cần kiểm tra"], correct: "A", explain: "Kiểm tra thực tế bao gồm soi chiếu máy soi hoặc kiểm tra thủ công mở thùng." },
+            { id: 13, question: "Câu 13: Mục đích chính của việc Phúc tập hồ sơ hải quan là gì?", options: ["Đánh giá chất lượng nghiệp vụ của công chức hải quan và phát hiện sai sót sau thông quan", "Để thu thêm tiền phạt sinh hoạt", "Để bắt giữ tàu biển", "Để tính lại tỷ giá"], correct: "A", explain: "Phúc tập hồ sơ nhằm kiểm tra nội bộ quy trình xử lý của công chức hải quan." },
+            { id: 14, question: "Câu 14: Khi Doanh nghiệp tự phát hiện khai sai sót thuế suất và làm hồ sơ khai bổ sung trước khi Hải quan công bố quyết định kiểm tra thì:", options: ["Nộp đủ tiền thuế thiếu + tiền chậm nộp 0.03%/ngày (không bị phạt vi phạm hành chính)", "Bị phạt trốn thuế gấp 3 lần", "Bị tước quyền kinh doanh XNK", "Bị tịch thu hàng hóa"], correct: "A", explain: "Tự nguyện khai bổ sung trước kiểm tra sẽ không bị xử phạt vi phạm hành chính." },
+            { id: 15, question: "Câu 15: Mã HS (HS Code) trong biểu thuế xuất nhập khẩu gồm tối thiểu bao nhiêu chữ số tại Việt Nam?", options: ["8 chữ số", "4 chữ số", "6 chữ số", "12 chữ số"], correct: "A", explain: "Biểu thuế XNK Việt Nam chi tiết đến 8 chữ số." },
+            { id: 16, question: "Câu 16: Thiết bị E-Seal điện tử được Hải quan ứng dụng chủ yếu trong khâu nghiệp vụ nào?", options: ["Giám sát hải quan đối với hàng hóa quá cảnh, chuyển cửa khẩu", "Tính thuế tự động", "Phân loại mã HS", "Tham vấn giá"], correct: "A", explain: "E-Seal giám sát vị trí định vị hàng vận chuyển chuyển cửa khẩu/quá cảnh." },
+            { id: 17, question: "Câu 17: Phạt tiền 20% số tiền thuế khai thiếu áp dụng đối với hành vi nào theo NĐ 128/2020/NĐ-CP?", options: ["Khai sai mã HS, thuế suất dẫn đến thiếu số tiền thuế phải nộp", "Nộp tờ khai chậm 1 phút", "Khai đúng nhưng nộp thuế chậm", "Không in mã vạch"], correct: "A", explain: "Hành vi khai sai dẫn đến thiếu thuế bị phạt 20% số thuế thiếu." },
+            { id: 18, question: "Câu 18: Lô hàng nhập khẩu nguyên liệu để sản xuất hàng xuất khẩu (SXXK) được miễn loại thuế nào?", options: ["Thuế nhập khẩu (nếu đáp ứng đủ điều kiện quản lý)", "Thuế giao thông", "Lệ phí bến cảng", "Phí xếp dỡ container"], correct: "A", explain: "Hàng nguyên liệu SXXK thuộc đối tượng miễn thuế NK theo Luật Thuế XNK." },
+            { id: 19, question: "Câu 19: Giấy chứng nhận xuất xứ hàng hóa Form D áp dụng cho hàng hóa có xuất xứ từ khu vực nào?", options: ["Các nước trong khối ASEAN", "Trung Quốc", "Liên minh châu Âu (EU)", "Hàn Quốc"], correct: "A", explain: "Form D áp dụng cho hiệp định ATIGA khối ASEAN." },
+            { id: 20, question: "Câu 20: Nếu doanh nghiệp nhập khẩu lô hàng bị hỏng hoàn toàn do thiên tai trong quá trình vận chuyển chưa thông quan thì được:", options: ["Xét giảm thuế tương ứng với tỷ lệ tổn thất thực tế của hàng hóa", "Phải nộp đủ 100% thuế", "Bị xử phạt hành chính", "Phải tái xuất ngay trong ngày"], correct: "A", explain: "Hàng hóa bị hư hỏng thiên tai trước thông quan được giảm thuế theo tỷ lệ tổn thất." },
+            { id: 21, question: "Câu 21: Mức tiền chậm nộp tiền thuế hải quan được tính theo tỷ lệ bao nhiêu?", options: ["0.03% / ngày trên số tiền thuế chậm nộp", "0.1% / ngày", "1% / tháng", "5% / năm"], correct: "A", explain: "Mức tính tiền chậm nộp tiền thuế là 0.03%/ngày theo Luật Quản lý thuế." },
+            { id: 22, question: "Câu 22: Chứng từ chứng minh trị giá giao dịch khi Hải quan tiến hành tham vấn giá bao gồm:", options: ["Hợp đồng, Invoice, L/C thanh toán qua ngân hàng, Bảng báo giá chính hãng, Cước vận tải", "Giấy phép lái xe", "Sổ hộ khẩu người đại diện", "Giấy chứng nhận đăng ký nhãn hiệu"], correct: "A", explain: "Các chứng từ thương mại thanh toán quốc tế dùng để chứng minh trị giá thực tế." },
+            { id: 23, question: "Câu 23: Tờ khai hải quan có giá trị làm thủ tục thông quan trong thời hạn bao nhiêu ngày kể từ ngày đăng ký?", options: ["15 ngày", "30 ngày", "07 ngày", "90 ngày"], correct: "A", explain: "Tờ khai hải quan có giá trị làm thủ tục trong 15 ngày." },
+            { id: 24, question: "Câu 24: Hàng hóa quá cảnh Việt Nam có bắt buộc phải làm thủ tục hải quan không?", options: ["Có, phải làm thủ tục hải quan và chịu sự giám sát hải quan", "Không cần làm thủ tục", "Chỉ làm thủ tục khi có yêu cầu từ Công an", "Chỉ cần báo cho Cảng vụ"], correct: "A", explain: "Hàng quá cảnh phải làm thủ tục và chịu sự giám sát hải quan từ cửa khẩu nhập đến cửa khẩu xuất." },
+            { id: 25, question: "Câu 25: Trường hợp kiểm tra thực tế hàng hóa phát hiện thừa so với khai báo thì xử lý ra sao?", options: ["Lập biên bản vi phạm, yêu cầu khai bổ sung nộp đủ thuế và xử phạt hành chính nếu có gian lận", "Cho qua không cần xử lý", "Tịch thu toàn bộ cả lô hàng đúng lẫn thừa", "Bắt buộc tiêu hủy ngay tại cảng"], correct: "A", explain: "Lập biên bản ghi nhận chênh lệch, xử lý thuế và vi phạm hành chính tương ứng." },
+            { id: 26, question: "Câu 26: Việc kiểm tra chuyên ngành đối với hàng hóa nhập khẩu (ATTP, kiểm dịch, chất lượng) do ai thực hiện?", options: ["Cơ quan kiểm tra chuyên ngành thuộc các Bộ quản lý ngành (Bộ Y tế, Bộ NN&PTNT, Bộ KH&CN...)", "Do công chức Hải quan trực tiếp xét nghiệm", "Do Cảng biển tự thực hiện", "Do UBND tỉnh cấp"], correct: "A", explain: "Cơ quan chuyên ngành thuộc các Bộ ngành phụ trách giám định/kiểm dịch." },
+            { id: 27, question: "Câu 27: Phí bản quyền trả cho việc sử dụng nhãn hiệu hàng hóa nhập khẩu có tính vào trị giá tính thuế hải quan không?", options: ["Có, phải cộng vào trị giá tính thuế nếu đáp ứng các điều kiện quy định", "Không bao giờ tính", "Tính vào tiền phạt", "Chỉ tính khi xuất khẩu"], correct: "A", explain: "Phí bản quyền là khoản điều chỉnh cộng vào trị giá tính thuế CIF." },
+            { id: 28, question: "Câu 28: Hệ thống phần mềm thông quan tự động của Hải quan Việt Nam hiện nay có tên gọi là gì?", options: ["VNACCS/VCIS", "ECUS4", "ASYCUDA", "TNSM"], correct: "A", explain: "Hệ thống VNACCS/VCIS do Nhật Bản tài trợ phát triển." },
+            { id: 29, question: "Câu 29: Địa điểm làm thủ tục hải quan bao gồm:", options: ["Trụ sở Chi cục Hải quan cửa khẩu và Trụ sở Chi cục Hải quan ngoài cửa khẩu", "Chỉ làm tại Hà Nội", "Tại nhà riêng doanh nghiệp", "Tại ngân hàng thương mại"], correct: "A", explain: "Địa điểm gồm Chi cục Hải quan cửa khẩu (cảng/sân bay) và ngoài cửa khẩu (ICD, KCN...)." },
+            { id: 30, question: "Câu 30: Mục đích của niêm phong hải quan (Seal) là gì?", options: ["Đảm bảo nguyên trạng hàng hóa trong quá trình vận chuyển, giám sát hải quan", "Đã thanh toán xong tiền thuế", "Để làm đẹp container", "Để phân biệt hàng giá rẻ"], correct: "A", explain: "Seal hải quan dùng để niêm phong đảm bảo nguyên trạng hàng hóa." }
+        ];
+
+        // Render 30 Exam Test Questions
+        function renderExamQuestions() {
+            const container = document.getElementById('exam-questions-list');
+            container.innerHTML = '';
+
+            examQuestionsData.forEach((q, idx) => {
+                const item = document.createElement('div');
+                item.className = 'quiz-card';
+                item.id = `exam-q-box-${q.id}`;
+
+                let optionsHtml = '';
+                const labels = ['A', 'B', 'C', 'D'];
+                q.options.forEach((opt, oIdx) => {
+                    optionsHtml += `
+                        <label>
+                            <input type="radio" name="exam_q_${q.id}" value="${labels[oIdx]}" onchange="onSelectAnswer(${q.id}, '${labels[oIdx]}')">
+                            <strong>${labels[oIdx]}.</strong> ${opt}
+                        </label>
+                    `;
+                });
+
+                item.innerHTML = `
+                    <div class="quiz-question">${q.question}</div>
+                    <div class="quiz-options">${optionsHtml}</div>
+                    <div id="gv-sol-${q.id}" class="accordion-content" style="margin-top: 10px; background: #fffbe6; border-color: #ffe58f; display: ${isGvUnlocked ? 'block' : 'none'};">
+                        <strong style="color: #d48806;"><i class="fa-solid fa-circle-check"></i> ĐÁP ÁN ĐÚNG CỦA GV: ${q.correct}</strong><br>
+                        <span><em>Giải thích:</em> ${q.explain}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Student Answer Selection
+        const studentAnswers = {};
+        function onSelectAnswer(qId, val) {
+            studentAnswers[qId] = val;
+        }
+
+        // GV Modal & Password Authentication
+        function openGvModal() {
+            document.getElementById('gv-modal').style.display = 'flex';
+            document.getElementById('gv-pass-input').value = '';
+            document.getElementById('gv-pass-input').focus();
+        }
+
+        function closeGvModal() {
+            document.getElementById('gv-modal').style.display = 'none';
+        }
+
+        function checkGvPass() {
+            const pass = document.getElementById('gv-pass-input').value;
+            if (pass === 'CDCT@1976') {
+                alert('Xác thực Giảng Viên thành công! Đã mở khóa hiển thị đáp án 30 bài kiểm tra.');
+                isGvUnlocked = true;
+                closeGvModal();
+                // Show solutions
+                examQuestionsData.forEach(q => {
+                    const solBox = document.getElementById(`gv-sol-${q.id}`);
+                    if (solBox) solBox.style.display = 'block';
+                });
+                // Switch to exam tab automatically
+                switchTab('exam', document.querySelectorAll('.nav-btn')[5]);
+            } else {
+                alert('Mật khẩu không chính xác! Vui lòng thử lại.');
+            }
+        }
+
+        // Export PDF Logic (A4 Portrait or Landscape)
+        function exportPDF(orientation) {
+            const name = document.getElementById('student-name').value.trim();
+            const id = document.getElementById('student-id').value.trim();
+
+            if (!name || !id) {
+                alert('VUI LÒNG NHẬP ĐẦY ĐỦ HỌ TÊN VÀ MÃ SỐ SINH VIÊN TRƯỚC KHU XUẤT BÀI LÀM!');
+                return;
+            }
+
+            // Create temporary container for clean PDF rendering
+            const exportWin = document.createElement('div');
+            exportWin.id = 'pdf-export-container';
+
+            let itemsHtml = '';
+            examQuestionsData.forEach((q) => {
+                const ans = studentAnswers[q.id] ? studentAnswers[q.id] : 'Chưa trả lời';
+                itemsHtml += `
+                    <div class="pdf-item">
+                        <div style="font-weight: bold;">${q.question}</div>
+                        <div style="margin-top: 4px; color: #1a5f7a;"><strong>-> Bài làm của sinh viên chọn:</strong> Đáp án [ ${ans} ]</div>
+                    </div>
+                `;
+            });
+
+            exportWin.innerHTML = `
+                <div class="pdf-header">
+                    <h2 style="margin-bottom: 5px; text-transform: uppercase;">BÀI LÀM KIỂM TRA LUYỆN TẬP - CHƯƠNG 5 HẢI QUAN</h2>
+                    <p style="font-size: 11px; color: #555;">Hệ Thống Mô Phỏng & Thực Hành Khai Báo Hải Quan</p>
+                </div>
+                <div class="pdf-student-info">
+                    <p><strong>HỌ VÀ TÊN SINH VIÊN:</strong> ${name.toUpperCase()}</p>
+                    <p><strong>MÃ SỐ SINH VIÊN (MSSV):</strong> ${id}</p>
+                    <p><strong>THỜI GIAN NỘP BÀI:</strong> ${new Date().toLocaleString('vi-VN')}</p>
+                </div>
+                <h3 style="margin-bottom: 10px; border-bottom: 1px solid #000; padding-bottom: 5px;">CHI TIẾT BÀI LÀM (ĐỀ VÀ BÀI LÀM SINH VIÊN)</h3>
+                <div>
+                    ${itemsHtml}
+                </div>
+            `;
+
+            document.body.appendChild(exportWin);
+
+            const opt = {
+                margin:       10,
+                filename:     `Bai_Lam_Hai_Quan_${id}_${name.replace(/\s+/g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: orientation }
+            };
+
+            html2pdf().set(opt).from(exportWin).save().then(() => {
+                document.body.removeChild(exportWin);
+            });
+        }
+
+        // Initialize App
+        window.onload = function() {
+            calculateTax();
+            renderExercises();
+            renderExamQuestions();
+        };
+    </script>
+</body>
+</html>
